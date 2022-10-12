@@ -1,101 +1,58 @@
 pipeline{
-    agent any
-    tools {
-  git 'Default'
-  maven 'maven'
-}
-
+    agent any 
+    tools{
+        maven 'mymaven'
+    }
     stages{
-        stage("checkout code"){
+        stage("build"){
             steps{
-                echo "========executing checkout code========"
-                checkout([$class: 'GitSCM', branches: [[name: '*/vivek']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/gviveknath/simple-java-maven-app.git']]])
-            }
-            post{
-                always{
-                    echo "========always========"
+                script{
+                    sh 'mvn install'
                 }
-                success{
-                    echo "========checkout code executed successfully========"
-                }
-                failure{
-                    echo "========checkout code execution failed========"
-                }
+
             }
         }
-        stage("bulid"){
+        stage("unit testing"){
             steps{
-                echo "========executing bulid========"
-                sh 'mvn clean install'
-            }
-            post{
-                always{
-                    echo "========always========"
-                }
-                success{
-                    echo "========bulid executed successfully========"
-                    archiveArtifacts artifacts: 'target/*.jar', followSymlinks: false
-                }
-                failure{
-                    echo "========bulid code execution failed========"
-                }
-            }
-        }
-        stage("unit test"){
-            steps{
-                echo "========executing test========"
+                
                 sh 'mvn test'
             }
             post{
-                always{
-                    echo "========always========"
-                }
                 success{
-                    echo "========test executed successfully========"
-                    junit 'target/surefire-reports/*.xml'
+                     echo "junit testing is success,publishing report"
+                     junit 'target/surefire-reports/*.xml'
+                
                 }
                 failure{
-                    echo "========test code execution failed========"
-                    junit 'target/surefire-reports/*.xml'
+                    echo "junit testing is failed"
+
                 }
             }
         }
-        stage("sonar scan"){
+        stage("sonar"){
             steps{
-                echo "========executing sonar scan========"
-                withSonarQubeEnv('MysonarQube') {
-                    sh "${tool('MySonarScaneer')}/bin/sonar-scanner \
-                        -Dsonar.projectKey=simple-java-maven-app \
+                script{
+                    withSonarQubeEnv(credentialsId: 'Mysonar') {
+                        sh "${tool("MySonarScaneer")}/bin/sonar-scanner \
+                        -Dsonar.projectKey=java \
                         -Dsonar.sources=. \
-                        -Dsonar.java.binaries=target/* \
-                        -Dsonar.host.url=http://172.31.10.64:9000 \
-                        -Dsonar.login=sqp_4cf0d67e258a6c9e26be1b843850595b29b5a749"
+                        -Dsonar.java.binaries=target \
+                        -Dsonar.host.url=http://172.31.13.146:9000 \
+                        -Dsonar.login=sqp_160fde0e1530ac062cf75adbe45ca3d5edf8fc7e"
+    
+                    }
                 }
             }
-            post{
-                always{
-                    echo "========always========"
-                }
-                success{
-                    echo "========test executed successfully========"
-                    junit 'target/surefire-reports/*.xml'
-                }
-                failure{
-                    echo "========test code execution failed========"
-                    junit 'target/surefire-reports/*.xml'
-                }
+
+        }
+        stage("upload artifact"){
+            steps{
+               sh 'mvn -s settings.xml deploy'
             }
         }
-      }
-    post{
-        always{
-            echo "========always========"
-        }
-        success{
-            echo "========pipeline executed successfully ========"
-        }
-        failure{
-            echo "========pipeline execution failed========"
-        }
+        
+        
+
     }
+
 }
