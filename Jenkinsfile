@@ -15,8 +15,8 @@ pipeline {
         ARTIFACTORY_SERVER_ID = 'jfrog-artifactory' // ID of your Artifactory server in Jenkins
         ARTIFACTORY_REPO_KEY = 'libs-release-local' // Your target Artifactory repo
         SONARQUBE_SERVER_ID = 'SonarQube' // ID of your SonarQube server in Jenkins
-        SONARQUBE_PROJECT_KEY = 'my-java-app-key' // Unique key for your project in SonarQube
-        SONARQUBE_PROJECT_NAME = 'My Java Application' // Name for your project in SonarQube
+        SONARQUBE_PROJECT_KEY = 'simple-java-maven-app' // Unique key for your project in SonarQube
+        SONARQUBE_PROJECT_NAME = 'simple-java-maven-app' // Name for your project in SonarQube
     }
 
     stages {
