@@ -52,7 +52,7 @@ pipeline {
                         projectKey: env.SONARQUBE_PROJECT_KEY,
                         projectName: env.SONARQUBE_PROJECT_NAME,
                         projectVersion: commonUtils.generateBuildNumber(),
-                        sources: src/main/java
+                        sourcePath: src/main/java
                     )
                 }
             }
