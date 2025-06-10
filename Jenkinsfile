@@ -1,96 +1,88 @@
-pipeline{
-   agent {
-       label "mybuildserver"
-   }
-    tools {
-        maven 'maven'
-    }
-    stages{
-        stage("code checkout"){
-            steps{
-                echo "========checking out code from github repo========"
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: '2d64d980-832f-4dd0-b22d-b5cb971e0a7a', url: 'https://github.com/vcroshan/simple-java-maven-app.git']]])
-            }
-            post{
-                success{
-                    echo "========Code checkout from Github repo completed========"
-                }
-                failure{
-                    echo "========Code checkout from Github repo failed========"
-                }
-            }
-        }
-        stage ("execute script") {
-            steps{
-                echo "Workspace:- $WORKSPACE"
-                echo "Job Name :- $JOB_NAME"
-                echo "Build ID :- $BUILD_ID"
-                echo "Jenkins Home :- $JENKINS_HOME"
-                echo "Inputparam1 : $Inputparam1"
-                echo "InputParam2 : $Inputparam2"
-            }
-        }
-        stage("Build") {
-            steps{
-                sh 'mvn -DskipTests clean package'
-            }
-            post{
-                success {
-                    echo "=========Build completed successfully============="
-                    
-                }
-                failure {
-                    echo "==========Build failed=========="
-                }
-            }
-        }
-        stage("Unit Testing") {
-            steps{
-                sh 'mvn test'
-            }
-            post {
-                success{
-                    echo "======Unit testing completed successfull, publishing report========="
-                    junit 'target/surefire-reports/*.xml'
-                }
-                failure{
-                    echo "==========unit test cases failed, report not published===="
-                }
-            }
-        }
-        stage ("sonar scanning") {
-            steps {
-                script { 
-                    //def scannerHome = tool name: 'mySonarScanner';
-                    withSonarQubeEnv("MySonarqube") {
-                        sh "${tool("mySonarscanner")}/bin/sonar-scanner \
-                        -Dsonar.projectKey=simple-java-maven-app \
-                        -Dsonar.sources=. \
-                        -Dsonar.java.binaries=target \
-                        -Dsonar.host.url=http://172.31.10.15:9000 \
-                        -Dsonar.login=cc178140ffe774764ca39f4c5f009e8756719923"
-                    }
-               }
-            }
-        }
-        stage ("Upload to Nexus") {
-            steps {
-                sh "mvn -gs ${WORKSPACE}/settings.xml deploy"
-               }
-            }
+// Jenkinsfile
 
-        
-    
+// Specify the shared library to use
+// 'my-shared-library' should match the 'Name' configured in Jenkins Global Pipeline Libraries
+// '@master' specifies the branch; change if you use 'main' or a specific version tag.
+@Library('jenkins-shared-lib@main') _
+
+pipeline {
+    // You can use a specific agent or 'any'
+    agent any
+
+    environment {
+        // Define environment variables used across stages
+        MAVEN_TOOL_NAME = 'maven3' // Name of the Maven tool configured in Jenkins
+        ARTIFACTORY_SERVER_ID = 'jfrog-artifactory' // ID of your Artifactory server in Jenkins
+        ARTIFACTORY_REPO_KEY = 'libs-release-local' // Your target Artifactory repo
+        SONARQUBE_SERVER_ID = 'SonarQube' // ID of your SonarQube server in Jenkins
+        SONARQUBE_PROJECT_KEY = 'my-java-app-key' // Unique key for your project in SonarQube
+        SONARQUBE_PROJECT_NAME = 'My Java Application' // Name for your project in SonarQube
     }
-    post{
-        always{
-            echo "========always========"
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "Checking out source code..."
+                    // Use a standard SCM checkout step (e.g., from GitHub)
+                    // You might use 'checkout scm' or more specific git steps
+                    git branch: 'main', url: 'https://github.com/vcroshan/simple-java-maven-app.git'
+                }
+            }
         }
-        success{
-            echo "========pipeline executed successfully ========"
+
+        stage('Build') {
+            steps {
+                script {
+                    echo "Building with Maven..."
+                    // Call the shared library function for Maven build
+                    // mavenBuild() // Uses default goal 'clean install'
+                    mavenBuild(goal: 'clean install -DskipTests') // Example with custom goal and options
+                }
+            }
         }
-        failure{
-            echo "========pipeline execution failed========"
+
+        stage('SonarQube Scan') {
+            steps {
+                script {
+                    echo "Running SonarQube scan..."
+                    // Call the shared library function for SonarQube scan
+                    sonarScan(
+                        serverName: env.SONARQUBE_SERVER_ID,
+                        projectKey: env.SONARQUBE_PROJECT_KEY,
+                        projectName: env.SONARQUBE_PROJECT_NAME,
+                        projectVersion: commonUtils.generateBuildNumber()
+                    )
+                }
+            }
+        }
+
+        stage('Publish to Artifactory') {
+            steps {
+                script {
+                    echo "Publishing artifacts to Artifactory..."
+                    // Call the shared library function to publish to JFrog Artifactory
+                    jfrogPublish(
+                        serverName: env.ARTIFACTORY_SERVER_ID,
+                        repoKey: env.ARTIFACTORY_REPO_KEY,
+                        buildInfoName: "${env.JOB_NAME}", // Or use a more specific name
+                        buildNumber: commonUtils.generateBuildNumber()
+                    )
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished for ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            // Add clean up or notification steps here
+        }
+        success {
+            echo "Pipeline succeeded!"
+        }
+        failure {
+            echo "Pipeline failed!"
         }
     }
 }
