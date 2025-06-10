@@ -17,6 +17,7 @@ pipeline {
         SONARQUBE_SERVER_ID = 'SonarServer' // ID of your SonarQube server in Jenkins
         SONARQUBE_PROJECT_KEY = 'simple-java-maven-app' // Unique key for your project in SonarQube
         SONARQUBE_PROJECT_NAME = 'simple-java-maven-app' // Name for your project in SonarQube
+        SOURCE_PATH = 'src/main/java'
     }
 
     stages {
@@ -52,7 +53,7 @@ pipeline {
                         projectKey: env.SONARQUBE_PROJECT_KEY,
                         projectName: env.SONARQUBE_PROJECT_NAME,
                         projectVersion: commonUtils.generateBuildNumber(),
-                        sourcePath: src/main/java
+                        sourcePath: env.SOURCE_PATH
                     )
                 }
             }
