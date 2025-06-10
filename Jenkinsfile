@@ -26,7 +26,7 @@ pipeline {
                     echo "Checking out source code..."
                     // Use a standard SCM checkout step (e.g., from GitHub)
                     // You might use 'checkout scm' or more specific git steps
-                    git branch: 'main', url: 'https://github.com/vcroshan/simple-java-maven-app.git'
+                    checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'Roshan-Github', url: 'https://github.com/vcroshan/simple-java-maven-app.git']])
                 }
             }
         }
