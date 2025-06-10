@@ -4,13 +4,13 @@
   <servers>
     <server>
       <id>releases</id> <!-- This ID must match your pom.xml distributionManagement release repo id -->
-      <username>NEXUS_USERNAME</username>
-      <password>NEXUS_PASSWORD</password> <!-- Reference a Jenkins secret text credential ID -->
+      <username>admin</username>
+      <password>Devops@12345</password> <!-- Reference a Jenkins secret text credential ID -->
     </server>
     <server>
       <id>snapshots</id> <!-- This ID must match your pom.xml distributionManagement snapshot repo id -->
-      <username>NEXUS_USERNAME</username>
-      <password>NEXUS_PASSWORD</password> <!-- Reference a Jenkins secret text credential ID -->
+      <username>admin</username>
+      <password>Devops@12345</password> <!-- Reference a Jenkins secret text credential ID -->
     </server>
   </servers>
   <mirrors>
