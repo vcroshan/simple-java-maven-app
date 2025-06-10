@@ -78,18 +78,20 @@
  <repositories>
     <repository>
       <id>mymaven-group</id>
-      <url>http://107.22.129.42:8081/repository/mymaven-group/</url>
+      <url>http://13.60.116.9:8084/repository/mymaven-group/</url>
     </repository>
   </repositories>
 
-    <distributionManagement>
-    <snapshotRepository>
-      <id>mymaven-snapshots</id>
-      <url>http://107.22.129.42:8081/repository/mymaven-snapshots/</url>
-    </snapshotRepository>
+  <distributionManagement>
     <repository>
-      <id>mymaven-releases</id>
-      <url>http://107.22.129.42:8081/repository/mymaven-releases/</url>
+      <id>releases</id> <!-- Must match an ID in Jenkins managed settings.xml servers -->
+      <name>Nexus Releases</name>
+      <url>http://13.60.116.9:8084/repository/maven-releases/</url>
     </repository>
+    <snapshotRepository>
+      <id>snapshots</id> <!-- Must match an ID in Jenkins managed settings.xml servers -->
+      <name>Nexus Snapshots</name>
+      <url>http://13.60.116.9:8084/repository/maven-snapshots/</url>
+    </snapshotRepository>
   </distributionManagement>
 </project>

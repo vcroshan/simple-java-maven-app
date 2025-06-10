@@ -59,16 +59,14 @@ pipeline {
             }
         }
 
-        stage('Publish to Artifactory') {
+        stage('Publish to Nexus') {
             steps {
                 script {
-                    echo "Publishing artifacts to Artifactory..."
-                    // Call the shared library function to publish to JFrog Artifactory
-                    jfrogPublish(
-                        serverName: env.ARTIFACTORY_SERVER_ID,
-                        repoKey: env.ARTIFACTORY_REPO_KEY,
-                        buildInfoName: "${env.JOB_NAME}", // Or use a more specific name
-                        buildNumber: commonUtils.generateBuildNumber()
+                    echo "Publishing artifacts to Nexus..."
+                    // Call the shared library function to publish to Nexus
+                    nexusPublish(
+                        // No specific parameters needed here if pom.xml and settings.xml are correctly configured
+                        mavenToolName: env.MAVEN_TOOL_NAME
                     )
                 }
             }
