@@ -14,7 +14,7 @@ pipeline {
         MAVEN_TOOL_NAME = 'maven3' // Name of the Maven tool configured in Jenkins
         ARTIFACTORY_SERVER_ID = 'jfrog-artifactory' // ID of your Artifactory server in Jenkins
         ARTIFACTORY_REPO_KEY = 'libs-release-local' // Your target Artifactory repo
-        SONARQUBE_SERVER_ID = 'SonarQube' // ID of your SonarQube server in Jenkins
+        SONARQUBE_SERVER_ID = 'SonarServer' // ID of your SonarQube server in Jenkins
         SONARQUBE_PROJECT_KEY = 'simple-java-maven-app' // Unique key for your project in SonarQube
         SONARQUBE_PROJECT_NAME = 'simple-java-maven-app' // Name for your project in SonarQube
     }
