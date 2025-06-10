@@ -3,7 +3,7 @@
 // Specify the shared library to use
 // 'my-shared-library' should match the 'Name' configured in Jenkins Global Pipeline Libraries
 // '@master' specifies the branch; change if you use 'main' or a specific version tag.
-@Library('jenkins-shared-lib@master') _
+@Library('jenkins-shared-lib@main') _
 
 pipeline {
     // You can use a specific agent or 'any'
